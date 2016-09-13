@@ -14,6 +14,35 @@ The definitive wiki resource describing all available Jenkins Job DSL API items 
 
 Until we add support for [testing DSL changes](https://github.com/deis/jenkins-jobs/issues/39) while developing, the [Jenkins Job DSL Playground](http://job-dsl.herokuapp.com/) can be used for verifying that the DSL parses correctly.  (If it does, an `xml` file will be generated.  For comparison, you can view an existing job's `xml` equivalent by navigating to `https://ci.deis.io/job/<job-name>/config.xml`)
 
+## Flow
+
+### When a Component PR is Created
+
+### When a Component PR is Merged to Master
+```
+Build─────────────────┐
+│                     │            - check out source code
+│      "logger"       │            - start E2E job and wait for it
+│                     │            - report final job status
+└──────────┬──────────┘
+           │
+           ▼
+E2E───────────────────┐
+│                     │            - build test Docker image
+│    "logger-e2e"     │            - run end-to-end tests
+│                     │            - start promote job and wait
+└──────────┬──────────┘
+           │
+           ▼
+Promote───────────────┐
+│                     │            - pull image from test repo
+│  "logger-promote"   │            - push image to production repo
+│                     │            - use the git SHA tag for both
+└─────────────────────┘
+```
+
+### When a Component is Tagged
+
 ## License
 
 Copyright 2013, 2014, 2015, 2016 Engine Yard, Inc.
